@@ -21,6 +21,7 @@ class pInterface {
     pColor getColorFromVal(int val);
 
     void drawGameOver();
+    void drawWinScreen();
     void drawScore();
     void retry();
     void undo();

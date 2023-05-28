@@ -65,7 +65,8 @@ void pInterface::modSquare(pSquare sq, pSquare newSq) {
 }
 
 void pInterface::handleInput(unsigned char key) {
-    if (!screen.gameOver) {
+    if (!screen.gameOver && !screen.win) {
+        screen.oScore = screen.score;
         undoBoard = board;
         if (key == 'w') {
             int cnt = 0, ch = 0;
@@ -221,12 +222,31 @@ void pInterface::handleInput(unsigned char key) {
             screen.gameOver = true;
     }
 
+    {
+        //ifWin
+        for (auto sq : board)
+            if (sq.val == 2048)
+                screen.win = true;
+    }
+
     render();
 }
 
 void pInterface::drawGameOver() {
     graphics.drawRect({ 0, data.offset }, { screen.size.first, screen.size.second - data.offset }, graphics.gameOverColor);
     std::string gvStr = "Game over !";
+    std::pair<int, int> textSize = { glutBitmapLength(GLUT_BITMAP_HELVETICA_18, reinterpret_cast<const unsigned char*>(gvStr.c_str())), 0};
+    for (size_t i = 0; i < strlen(gvStr.c_str()); ++i)
+        if (textSize.second < glutBitmapWidth(GLUT_BITMAP_HELVETICA_18, gvStr.c_str()[i]))
+            textSize.second = glutBitmapWidth(GLUT_BITMAP_HELVETICA_18, gvStr.c_str()[i]);
+    graphics.drawText({ (screen.size.first / 2) - (textSize.first / 2), ((screen.size.second + data.offset) / 2) - (textSize.second / 2) }, GLUT_BITMAP_HELVETICA_18, gvStr.c_str(), graphics.black);
+}
+
+void pInterface::drawWinScreen() {
+    graphics.color2048.a = 76;
+    graphics.drawRect({ 0, data.offset }, { screen.size.first, screen.size.second - data.offset }, graphics.color2048);
+    graphics.color2048.a = 255;
+    std::string gvStr = "You win !";
     std::pair<int, int> textSize = { glutBitmapLength(GLUT_BITMAP_HELVETICA_18, reinterpret_cast<const unsigned char*>(gvStr.c_str())), 0};
     for (size_t i = 0; i < strlen(gvStr.c_str()); ++i)
         if (textSize.second < glutBitmapWidth(GLUT_BITMAP_HELVETICA_18, gvStr.c_str()[i]))
@@ -241,6 +261,7 @@ void pInterface::drawScore() {
 
 void pInterface::retry() {
     screen.gameOver = false;
+    screen.win = false;
     bInit = false;
     screen.score = 0;
     board.clear();
@@ -248,6 +269,8 @@ void pInterface::retry() {
 }
 
 void pInterface::undo() {
+    screen.score = screen.oScore;
+    screen.win = false;
     screen.gameOver = false;
     board = undoBoard;
 }

@@ -34,7 +34,8 @@ void Render() {
         interface.graphics.drawText({ i.pos.first + ((interface.data.squareSize - textSize.first) / 2), i.pos.second + (interface.data.squareSize / 2) + textSize.second / 2 }, GLUT_BITMAP_TIMES_ROMAN_24, std::to_string(i.val).c_str(), interface.graphics.black);
     }
     interface.drawScore();
-    if (interface.screen.gameOver) interface.drawGameOver();
+    if (interface.screen.gameOver && !interface.screen.win) interface.drawGameOver();
+    if (interface.screen.win) interface.drawWinScreen();
     retryBtn.draw(interface);
     undoBtn.draw(interface);
     glutSwapBuffers();

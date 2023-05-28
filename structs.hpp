@@ -20,6 +20,8 @@ struct pScreen {
     bool leftClickDrag = false;
 
     bool gameOver = false;
+    bool win = false;
     int score = 0;
+    int oScore = 0;
     int bestScore = 0;
 };
